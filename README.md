@@ -15,6 +15,19 @@
 
 ## 初次安装 Alpine 后配置
 
+> 如果你不想一步一步操作，可以直接复制 setup.sh 内容。然后执行
+>
+> ```shell
+> vi setup.sh
+> # 按下 i 键进入编辑模式
+> i
+> # 然后粘贴 setup.sh 内容
+> # 保存
+> :wq
+> chomod +x ./setup.sh
+> ./setup.sh
+> ```
+
 初次安装 Alpine 默认没有 ssh 服务，先通过 pve 控制台进入 Alpine
 
 ### 软件源
