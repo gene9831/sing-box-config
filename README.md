@@ -40,10 +40,6 @@ apk update && apk upgrade
 
 ```shell
 apk add openssh-server
-# 启动服务
-rc-service sshd start
-# 设置开机启动
-rc-update add sshd
 ```
 
 安装 nano 编辑器
@@ -64,15 +60,19 @@ nano /etc/ssh/sshd_config
 PermitRootLogin yes
 ```
 
-重启 sshd
+启动 ssh 服务
 
 ```shell
-rc-service sshd restart
+
+# 启动服务
+rc-service sshd start
+# 设置开机启动
+rc-update add sshd
 ```
 
 ### sing-box
 
-通过 edge/testing 源安装 sing-box
+现在可以通过 ssh 客户端来配置了。通过 edge/testing 源安装 sing-box
 
 ```shell
 apk add sing-box -X https://mirrors.tuna.tsinghua.edu.cn/alpine/edge/testing
@@ -104,7 +104,7 @@ curl -I https://www.google.com
 
 启用 IP 转发
 
-编辑 `/etc/sysctl.conf` 文件，确保以下行已启用
+编辑 `/etc/sysctl.d/99-ip-forward.conf` 文件，添加下面配置
 
 ```shell
 net.ipv4.ip_forward=1
@@ -113,16 +113,25 @@ net.ipv4.ip_forward=1
 然后应用更改
 
 ```shell
-sysctl -p
+# 应用更改
+sysctl -p /etc/sysctl.d/99-ip-forward.conf
+# 检查是否生效
+sysctl net.ipv4.ip_forward
 ```
 
-安装 iptables
+sysctl 服务开机自启动
+
+```shell
+rc-service sysctl start
+rc-update add sysctl
+```
+
+iptables 配置
+
+运行命令添加配置
 
 ```shell
 apk add iptables
-```
-
-```shell
 iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
 iptables -A FORWARD -i eth0 -o tun0 -j ACCEPT
 iptables -A FORWARD -i tun0 -o eth0 -j ACCEPT
@@ -130,8 +139,11 @@ iptables -A FORWARD -i tun0 -o eth0 -j ACCEPT
 rc-service iptables save
 # 查看已保存的 iptables
 cat /etc/iptables/rules-save
+# 启动服务并添加开机启动项
+rc-service iptables start
+rc-update add iptables
 ```
 
 ### 终端设备配置
 
-配置网关和 dns 为 alpine 的地址即可
+终端设备配置网关和 dns 为 alpine 的 ip 地址即可
